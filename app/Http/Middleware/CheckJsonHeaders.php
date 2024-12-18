@@ -16,10 +16,10 @@ class CheckJsonHeaders
     public function handle(Request $request, Closure $next): Response
     {
 
-        //     // Allow requests to a specific route without checks
-        // if ($request->is('redbiller/webhook/*')) {
-        //     return $next($request);
-        // }
+        // Allow requests to a specific route without checks
+        if ($request->is('redbiller/webhook/*')) {
+            return $next($request);
+        }
 
         if (
             $request->header('Accept') !== 'application/json' ||

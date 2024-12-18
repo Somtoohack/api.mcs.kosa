@@ -16,7 +16,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
 
-        // $middleware->append(CheckJsonHeaders::class);
+        $middleware->append(CheckJsonHeaders::class);
 
     })
     ->withExceptions(function (Exceptions $exceptions) {
