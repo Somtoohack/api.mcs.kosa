@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Middleware;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
 class CheckJsonHeaders
@@ -28,27 +28,38 @@ class CheckJsonHeaders
             return response()->json(
                 [
                     'success' => false,
-                    'code' => 4000,
+                    'code'    => 4000,
                     'message' => 'Request denied',
-                    'error' => 'Invalid request pattern.',
+                    'error'   => 'Invalid request pattern.',
                 ],
                 200
             );
         }
         if (
-            trim($request->header('VOBS-INTEGRATION-TARGET-KEY')) !== trim(env('VOBS_INTEGRATION_TARGET_KEY')) ||
-            trim($request->header('VOBS-INTEGRATION-SOURCE-KEY')) !== trim(env('VOBS_INTEGRATION_SOURCE_KEY'))
+            trim($request->header('KOSA-MCS-KEY')) !== trim(env('KOSA_MCS_KEY')) ||
+            trim($request->header('KOSA-CORE-KEY')) !== trim(env('KOSA_CORE_KEY'))
         ) {
             return response()->json(
                 [
                     'success' => false,
-                    'code' => 4000,
+                    'code'    => 4000,
                     'message' => 'Request denied',
-                    'error' => 'Unidentified Source or Target.',
+                    'error'   => 'Unidentified Source or Target.',
                 ],
                 200
             );
         }
+
+        Log::info('Request Details:', [
+            'attributes' => $request->attributes->all(),
+            'request'    => $request->all(),
+            'query'      => $request->query->all(),
+            'server'     => $request->server->all(),
+            'files'      => $request->files->all(),
+            'cookies'    => $request->cookies->all(),
+            'headers'    => $request->headers->all(),
+        ]);
+
         return $next($request);
     }
 }

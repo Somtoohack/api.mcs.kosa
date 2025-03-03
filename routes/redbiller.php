@@ -62,6 +62,7 @@ Route::prefix('redbiller')->group(function () {
     Route::prefix('kyc')->group(function () {
         // BVN Verification Routes
         Route::post('/bvn/lookup', [KYCController::class, 'lookupBVN']);
+        Route::post('/bvn/verify/1.0', [KYCController::class, 'verifyBVN']);
         Route::post('/bvn/verify/2.0', [KYCController::class, 'verifyBVN2']);
         Route::post('/bvn/verify/3.0', [KYCController::class, 'verifyBVN3']);
 
@@ -81,7 +82,7 @@ Route::prefix('redbiller')->group(function () {
     });
 
     Route::prefix('webhook')->group(function () {
-        Route::post('/deposit/receive', [WebhookController::class, 'handleDepositWebhook']);
+        Route::post('/deposit/verify', [WebhookController::class, 'verifyDepositWebhook']);
         Route::post('/bank-transfer/receive', [WebhookController::class, 'handleBankTransferWebhook']);
         Route::post('/airtime/receive', [WebhookController::class, 'handleAirtimeWebhook']);
         Route::post('/data/receive', [WebhookController::class, 'handleDataWebhook']);

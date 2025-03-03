@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Mail;
 
 use Illuminate\Bus\Queueable;
@@ -19,8 +18,8 @@ class InsufficientBalanceAlert extends Mailable
 
     public function build()
     {
-        return $this->from('urgent-action@mcs.vobs.com', env('APP_NAME', 'VOBS'))
-            ->subject('😴😑 Urgent Redbiller Provider Insufficient Balance Alert')
+        return $this->from('support@reventsystems.com', env('APP_NAME', 'KOSA MCS'))
+            ->subject('😴😑 Urgent -- Redbiller Provider Insufficient Balance Alert')
             ->view('mails.insufficient_balance')
             ->with(['result' => $this->result]);
     }

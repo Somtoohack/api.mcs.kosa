@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Redbiller;
 
 use App\Http\Controllers\Controller;
@@ -22,7 +21,7 @@ class BillPaymentController extends Controller
     public function __construct(TransactionAlertService $transactionAlertService, BillPaymentService $billPaymentService)
     {
         $this->transactionAlertService = $transactionAlertService;
-        $this->billPaymentService = $billPaymentService;
+        $this->billPaymentService      = $billPaymentService;
     }
 
     /**
@@ -69,18 +68,18 @@ class BillPaymentController extends Controller
     public function purchaseDataPlan(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'product' => 'required|string|in:Airtel,MTN,Glo,9mobile',
-            'code' => 'required|string',
-            'phone_no' => 'required|string',
-            'ported' => 'nullable|string',
+            'product'      => 'required|string|in:Airtel,MTN,Glo,9mobile',
+            'code'         => 'required|string',
+            'phone_no'     => 'required|string',
+            'ported'       => 'nullable|string',
             'callback_url' => 'nullable|url',
-            'reference' => 'required|string|max:250',
+            'reference'    => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
-        if (!$this->validateAmount('data', $request->amount)) {
+        if (! $this->validateAmount('data', $request->amount)) {
             return response()->json(['error' => 'Invalid amount for data plan. Amount should be between 50 and 50000'], 422);
         }
 
@@ -102,21 +101,21 @@ class BillPaymentController extends Controller
     public function purchaseElectricity(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'product' => 'required|string',
-            'meter_no' => 'required|string',
+            'product'       => 'required|string',
+            'meter_no'      => 'required|string',
             'customer_name' => 'nullable|string',
-            'meter_type' => 'required|string|in:PREPAID,POSTPAID',
-            'phone_no' => 'required|string',
-            'amount' => 'required|numeric',
-            'callback_url' => 'nullable|url',
-            'reference' => 'required|string|max:250',
+            'meter_type'    => 'required|string|in:PREPAID,POSTPAID',
+            'phone_no'      => 'required|string',
+            'amount'        => 'required|numeric',
+            'callback_url'  => 'nullable|url',
+            'reference'     => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if (!$this->validateAmount('electricity', $request->amount)) {
+        if (! $this->validateAmount('electricity', $request->amount)) {
             return response()->json(['error' => 'Invalid amount for electricity purchase. Amount should be between 100 and 500000'], 422);
         }
 
@@ -138,8 +137,8 @@ class BillPaymentController extends Controller
     public function verifyMeterNumber(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'product' => 'required|string|in:Abuja,Eko,Enugu,Jos,Ibadan,Ikeja,Kaduna,Kano,Portharcourt,Benin',
-            'meter_no' => 'required|string',
+            'product'    => 'required|string|in:Abuja,Eko,Enugu,Jos,Ibadan,Ikeja,Kaduna,Kano,Portharcourt,Benin',
+            'meter_no'   => 'required|string',
             'meter_type' => 'required|string|in:PREPAID,POSTPAID',
         ]);
 
@@ -161,7 +160,7 @@ class BillPaymentController extends Controller
     public function verifyDecoderNumber(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'product' => 'required|string|in:DStv,GOtv,StarTimes',
+            'product'       => 'required|string|in:DStv,GOtv,StarTimes',
             'smart_card_no' => 'required|string',
         ]);
 
@@ -183,20 +182,20 @@ class BillPaymentController extends Controller
     public function purchaseCableTV(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'product' => 'required|string|in:DStv,GOtv,StarTimes',
-            'code' => 'required|string',
+            'product'       => 'required|string|in:DStv,GOtv,StarTimes',
+            'code'          => 'required|string',
             'smart_card_no' => 'required|string',
             'customer_name' => 'nullable|string',
-            'phone_no' => 'required|string',
-            'callback_url' => 'nullable|url',
-            'reference' => 'required|string|max:250',
+            'phone_no'      => 'required|string',
+            'callback_url'  => 'nullable|url',
+            'reference'     => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if (!$this->validateAmount('cable', $request->amount)) {
+        if (! $this->validateAmount('cable', $request->amount)) {
             return response()->json(['error' => 'Invalid amount for cable TV subscription. Amount should be between 100 and 100000'], 422);
         }
 
@@ -218,19 +217,19 @@ class BillPaymentController extends Controller
     public function creditBettingAccount(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'product' => 'required|string',
-            'customer_id' => 'required|string',
-            'amount' => 'required|numeric',
-            'phone_no' => 'required|string',
+            'product'      => 'required|string',
+            'customer_id'  => 'required|string',
+            'amount'       => 'required|numeric',
+            'phone_no'     => 'required|string',
             'callback_url' => 'nullable|url',
-            'reference' => 'required|string|max:250',
+            'reference'    => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if (!$this->validateAmount('betting', $request->amount)) {
+        if (! $this->validateAmount('betting', $request->amount)) {
             return response()->json(['error' => 'Invalid amount for betting account. Amount should be between 100 and 50000'], 422);
         }
 
@@ -252,7 +251,7 @@ class BillPaymentController extends Controller
     public function verifyBettingAccount(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'product' => 'required|string',
+            'product'     => 'required|string',
             'customer_id' => 'required|string',
         ]);
 
@@ -582,7 +581,7 @@ class BillPaymentController extends Controller
     {
         // Validate bill type
         $validBillTypes = ['airtime', 'data', 'electricity', 'cable', 'internet', 'betting'];
-        if (!in_array($billType, $validBillTypes)) {
+        if (! in_array($billType, $validBillTypes)) {
             return response()->json([
                 'error' => 'Invalid bill type. Supported types are: ' . implode(', ', $validBillTypes),
             ], 422);
@@ -590,13 +589,13 @@ class BillPaymentController extends Controller
 
         // Validate request parameters
         $validator = Validator::make($request->all(), [
-            'status' => 'nullable|string|in:Pending,Approved,Cancelled,Declined',
-            'product' => 'nullable|string',
-            'channel' => 'nullable|string|in:API,Web,Mobile,Workforce',
+            'status'     => 'nullable|string|in:Pending,Approved,Cancelled,Declined',
+            'product'    => 'nullable|string',
+            'channel'    => 'nullable|string|in:API,Web,Mobile,Workforce',
             'start_date' => 'nullable|date_format:Y-m-d',
-            'end_date' => 'nullable|date_format:Y-m-d',
-            'page' => 'nullable|integer|min:1',
-            'limit' => 'nullable|integer|min:1|max:100',
+            'end_date'   => 'nullable|date_format:Y-m-d',
+            'page'       => 'nullable|integer|min:1',
+            'limit'      => 'nullable|integer|min:1|max:100',
         ]);
 
         if ($validator->fails()) {
@@ -632,21 +631,21 @@ class BillPaymentController extends Controller
             case 'airtime':
             case 'data':
                 $rules['phone_no'] = 'nullable|string';
-                $rules['product'] = 'nullable|string|in:Airtel,MTN,Glo,9mobile';
+                $rules['product']  = 'nullable|string|in:Airtel,MTN,Glo,9mobile';
                 break;
 
             case 'electricity':
-                $rules['product'] = 'nullable|string|in:Abuja,Eko,Enugu,Jos,Ibadan,Ikeja,Kaduna,Kano,Portharcourt,Benin';
+                $rules['product']  = 'nullable|string|in:Abuja,Eko,Enugu,Jos,Ibadan,Ikeja,Kaduna,Kano,Portharcourt,Benin';
                 $rules['meter_no'] = 'nullable|string';
                 break;
 
             case 'cable':
-                $rules['product'] = 'nullable|string|in:DStv,GOtv,StarTimes';
+                $rules['product']       = 'nullable|string|in:DStv,GOtv,StarTimes';
                 $rules['smart_card_no'] = 'nullable|string';
                 break;
 
             case 'internet':
-                $rules['product'] = 'nullable|string|in:Smile,Spectranet';
+                $rules['product']   = 'nullable|string|in:Smile,Spectranet';
                 $rules['device_no'] = 'nullable|string';
                 break;
 
@@ -664,12 +663,12 @@ class BillPaymentController extends Controller
     private function prepareHistoryFilters(array $requestData, string $billType): array
     {
         $filters = array_filter([
-            'status' => $requestData['status'] ?? null,
-            'channel' => $requestData['channel'] ?? null,
+            'status'     => $requestData['status'] ?? null,
+            'channel'    => $requestData['channel'] ?? null,
             'start_date' => $requestData['start_date'] ?? null,
-            'end_date' => $requestData['end_date'] ?? null,
-            'page' => $requestData['page'] ?? 1,
-            'limit' => $requestData['limit'] ?? 50,
+            'end_date'   => $requestData['end_date'] ?? null,
+            'page'       => $requestData['page'] ?? 1,
+            'limit'      => $requestData['limit'] ?? 50,
         ]);
 
         // Add bill type specific filters
@@ -677,21 +676,21 @@ class BillPaymentController extends Controller
             case 'airtime':
             case 'data':
                 $filters['phone_no'] = $requestData['phone_no'] ?? null;
-                $filters['product'] = $requestData['product'] ?? null;
+                $filters['product']  = $requestData['product'] ?? null;
                 break;
 
             case 'electricity':
-                $filters['product'] = $requestData['product'] ?? null;
+                $filters['product']  = $requestData['product'] ?? null;
                 $filters['meter_no'] = $requestData['meter_no'] ?? null;
                 break;
 
             case 'cable':
-                $filters['product'] = $requestData['product'] ?? null;
+                $filters['product']       = $requestData['product'] ?? null;
                 $filters['smart_card_no'] = $requestData['smart_card_no'] ?? null;
                 break;
 
             case 'internet':
-                $filters['product'] = $requestData['product'] ?? null;
+                $filters['product']   = $requestData['product'] ?? null;
                 $filters['device_no'] = $requestData['device_no'] ?? null;
                 break;
 
@@ -701,7 +700,7 @@ class BillPaymentController extends Controller
         }
 
         return array_filter($filters, function ($value) {
-            return !is_null($value);
+            return ! is_null($value);
         });
     }
 }

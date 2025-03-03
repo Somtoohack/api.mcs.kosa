@@ -1,9 +1,10 @@
 <?php
-
 namespace App\Services\Redbiller;
 
 use App\Mail\InsufficientBalanceAlert;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
+use Throwable;
 
 class TransactionAlertService
 {
@@ -17,9 +18,13 @@ class TransactionAlertService
             $result['details']['error']['message'] == "Insufficient balance to process this transaction.") {
 
             // Send email alert
-            Mail::to('akosasomtoo100@gmail.com')
-                ->from('feedback@flutterswapnow.ltd', 'FlutterSwapNow')
-                ->send(new InsufficientBalanceAlert($result));
+            try {
+                Mail::to('nexdatech@gmail.com')
+                    ->send(new InsufficientBalanceAlert($result));
+            } catch (Throwable $th) {
+                Log::error($th);
+            }
+
         }
     }
 }

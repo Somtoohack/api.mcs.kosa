@@ -1,9 +1,9 @@
 <?php
-
 namespace App\Http\Controllers\Redbiller;
 
 use App\Http\Controllers\Controller;
 use App\Services\Redbiller\KYCService;
+use App\Services\Redbiller\TransactionAlertService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -11,10 +11,12 @@ use Illuminate\Support\Facades\Validator;
 class KYCController extends Controller
 {
     protected KYCService $kycService;
+    protected TransactionAlertService $transactionAlertService;
 
-    public function __construct(KYCService $kycService)
+    public function __construct(KYCService $kycService, TransactionAlertService $transactionAlertService)
     {
-        $this->kycService = $kycService;
+        $this->kycService              = $kycService;
+        $this->transactionAlertService = $transactionAlertService;
     }
 
     /**
@@ -24,8 +26,8 @@ class KYCController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'account_no' => 'required|string',
-            'bank_code' => 'required|string',
-            'reference' => 'required|string|max:250',
+            'bank_code'  => 'required|string',
+            'reference'  => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
@@ -50,7 +52,7 @@ class KYCController extends Controller
     public function verifyBVN2(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'bvn' => 'required|string|size:11',
+            'bvn'       => 'required|string|size:11',
             'reference' => 'required|string|max:250',
         ]);
 
@@ -65,6 +67,28 @@ class KYCController extends Controller
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
+    /**
+     * Verify BVN 1.0
+     */
+    public function verifyBVN(Request $request): JsonResponse
+    {
+        $validator = Validator::make($request->all(), [
+            'bvn'       => 'required|string|size:11',
+            'reference' => 'required|string|max:250',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 422);
+        }
+
+        try {
+            $result = $this->kycService->verifyBVN($request->bvn, $request->reference);
+            $this->transactionAlertService->checkAndNotify($result);
+            return response()->json($result);
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
 
     /**
      * Verify BVN 3.0
@@ -72,7 +96,7 @@ class KYCController extends Controller
     public function verifyBVN3(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'bvn' => 'required|string|size:11',
+            'bvn'       => 'required|string|size:11',
             'reference' => 'required|string|max:250',
         ]);
 
@@ -94,7 +118,7 @@ class KYCController extends Controller
     public function verifyPhoneNumber(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'phone_no' => 'required|string',
+            'phone_no'  => 'required|string',
             'reference' => 'required|string|max:250',
         ]);
 
@@ -116,7 +140,7 @@ class KYCController extends Controller
     public function verifyNIN(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'nin' => 'required|string|size:11',
+            'nin'       => 'required|string|size:11',
             'reference' => 'required|string|max:250',
         ]);
 
@@ -126,6 +150,7 @@ class KYCController extends Controller
 
         try {
             $result = $this->kycService->verifyNIN($request->nin, $request->reference);
+            $this->transactionAlertService->checkAndNotify($result);
             return response()->json($result);
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -138,11 +163,11 @@ class KYCController extends Controller
     public function verifyVotersCard(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'first_name' => 'required|string',
-            'surname' => 'required|string',
-            'vin' => 'required|string',
+            'first_name'    => 'required|string',
+            'surname'       => 'required|string',
+            'vin'           => 'required|string',
             'date_of_birth' => 'required|date_format:Y-m-d',
-            'reference' => 'required|string|max:250',
+            'reference'     => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
@@ -163,10 +188,10 @@ class KYCController extends Controller
     public function verifyPassport(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'surname' => 'required|string',
-            'passport_no' => 'required|string',
+            'surname'       => 'required|string',
+            'passport_no'   => 'required|string',
             'date_of_birth' => 'required|date_format:Y-m-d',
-            'reference' => 'required|string|max:250',
+            'reference'     => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
@@ -187,9 +212,9 @@ class KYCController extends Controller
     public function verifyCAC(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'company_name' => 'nullable|string',
+            'company_name'        => 'nullable|string',
             'registration_number' => 'required|string',
-            'reference' => 'required|string|max:250',
+            'reference'           => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
@@ -210,7 +235,7 @@ class KYCController extends Controller
     public function verifyTIN(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'tin' => 'required|string',
+            'tin'       => 'required|string',
             'reference' => 'required|string|max:250',
         ]);
 
@@ -233,7 +258,7 @@ class KYCController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'account_no' => 'required|string',
-            'reference' => 'required|string|max:250',
+            'reference'  => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
@@ -255,8 +280,8 @@ class KYCController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'account_no' => 'required|string',
-            'bank_code' => 'required|string',
-            'reference' => 'required|string|max:250',
+            'bank_code'  => 'required|string',
+            'reference'  => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
@@ -282,7 +307,7 @@ class KYCController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'account_no' => 'required|string',
-            'bank_code' => 'required|string',
+            'bank_code'  => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -307,8 +332,8 @@ class KYCController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'account_no' => 'required|string',
-            'bank_code' => 'required|string',
-            'amount' => 'required|numeric|min:0',
+            'bank_code'  => 'required|string',
+            'amount'     => 'required|numeric|min:0',
         ]);
 
         if ($validator->fails()) {

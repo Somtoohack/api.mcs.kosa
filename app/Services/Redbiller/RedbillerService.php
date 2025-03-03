@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services\Redbiller;
 
 use Exception;
@@ -15,11 +14,11 @@ class RedbillerService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.redbiller.base_url');
+        $this->baseUrl    = config('services.redbiller.base_url');
         $this->privateKey = config('services.redbiller.private_key');
-        $this->publicKey = config('services.redbiller.public_key');
-        $this->headers = [
-            'Private-Key' => $this->privateKey,
+        $this->publicKey  = config('services.redbiller.public_key');
+        $this->headers    = [
+            'Private-Key'  => $this->privateKey,
             'Content-Type' => 'application/json',
         ];
     }
@@ -34,11 +33,11 @@ class RedbillerService
             $basePath = public_path('redbiller');
             $hookPath = $basePath . '/' . config('services.redbiller.auth_hook');
 
-            if (!file_exists($basePath)) {
+            if (! file_exists($basePath)) {
                 mkdir($basePath, 0755, true);
             }
 
-            if (!file_exists($hookPath)) {
+            if (! file_exists($hookPath)) {
                 mkdir($hookPath, 0755, true);
             }
 
@@ -76,7 +75,7 @@ class RedbillerService
     public function initiateBankTransfer(array $data): array
     {
         try {
-            if (!$this->create3DAuthFile($data['reference'])) {
+            if (! $this->create3DAuthFile($data['reference'])) {
                 throw new Exception('Failed to create 3D authentication file');
             }
 
@@ -119,7 +118,7 @@ class RedbillerService
         try {
             $response = Http::withHeaders($this->headers)
                 ->get($this->baseUrl . '/payout/bank-transfer/banks/list', [
-                    'country_code' => 'NG',
+                    'country_code'  => 'NG',
                     'currency_code' => 'NGN',
                 ]);
 
@@ -139,7 +138,7 @@ class RedbillerService
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/bank-account/verify', [
                     'account_no' => $accountNo,
-                    'bank_code' => $bankCode,
+                    'bank_code'  => $bankCode,
                 ]);
 
             return $response->json();

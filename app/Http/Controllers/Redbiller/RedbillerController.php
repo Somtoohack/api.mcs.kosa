@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Redbiller;
 
 use App\Http\Controllers\Controller;
@@ -20,7 +19,7 @@ class RedbillerController extends Controller
 
     public function __construct(RedbillerService $redbillerService, TransactionAlertService $transactionAlertService)
     {
-        $this->redbillerService = $redbillerService;
+        $this->redbillerService        = $redbillerService;
         $this->transactionAlertService = $transactionAlertService;
     }
 
@@ -30,19 +29,19 @@ class RedbillerController extends Controller
     public function initiateBankTransfer(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'account_no' => 'required|string',
-            'bank_code' => 'required|string',
-            'amount' => 'required|numeric',
-            'narration' => 'required|string',
+            'account_no'   => 'required|string',
+            'bank_code'    => 'required|string',
+            'amount'       => 'required|numeric',
+            'narration'    => 'required|string',
             'callback_url' => 'nullable|url',
-            'reference' => 'required|string|max:250',
+            'reference'    => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        if (!$this->validateReference($request->reference)) {
+        if (! $this->validateReference($request->reference)) {
             return response()->json(['error' => 'Reference exceeds maximum length of 250 characters'], 422);
         }
 
@@ -125,7 +124,7 @@ class RedbillerController extends Controller
     {
         $validator = Validator::make($request->all(), [
             'account_no' => 'required|string',
-            'bank_code' => 'required|string',
+            'bank_code'  => 'required|string',
         ]);
 
         if ($validator->fails()) {
@@ -149,16 +148,16 @@ class RedbillerController extends Controller
     public function createPaymentSubAccount(Request $request): JsonResponse
     {
         $validator = Validator::make($request->all(), [
-            'bank' => 'required|string',
-            'first_name' => 'required|string',
-            'surname' => 'required|string',
-            'phone_no' => 'required|string',
-            'email' => 'required|email',
-            'bvn' => 'required|string',
-            'date_of_birth' => 'required|date_format:Y-m-d',
+            'bank'            => 'required|string',
+            'first_name'      => 'required|string',
+            'surname'         => 'required|string',
+            'phone_no'        => 'required|string',
+            'email'           => 'required|email',
+            'bvn'             => 'required|string',
+            'date_of_birth'   => 'required|date_format:Y-m-d',
             'auto_settlement' => 'nullable|string',
-            'callback_url' => 'nullable|url',
-            'reference' => 'required|string|max:250',
+            'callback_url'    => 'nullable|url',
+            'reference'       => 'required|string|max:250',
         ]);
 
         if ($validator->fails()) {

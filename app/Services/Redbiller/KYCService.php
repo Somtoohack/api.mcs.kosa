@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Services\Redbiller;
 
 use Exception;
@@ -14,10 +13,10 @@ class KYCService
 
     public function __construct()
     {
-        $this->baseUrl = config('services.redbiller.base_url');
+        $this->baseUrl    = config('services.redbiller.base_url');
         $this->privateKey = config('services.redbiller.private_key');
-        $this->headers = [
-            'Private-Key' => $this->privateKey,
+        $this->headers    = [
+            'Private-Key'  => $this->privateKey,
             'Content-Type' => 'application/json',
         ];
     }
@@ -31,8 +30,8 @@ class KYCService
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/bvn/lookup', [
                     'account_no' => $accountNo,
-                    'bank_code' => $bankCode,
-                    'reference' => $reference,
+                    'bank_code'  => $bankCode,
+                    'reference'  => $reference,
                 ]);
 
             return $response->json();
@@ -50,13 +49,32 @@ class KYCService
         try {
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/bvn/verify.2.0', [
-                    'bvn' => $bvn,
+                    'bvn'       => $bvn,
                     'reference' => $reference,
                 ]);
 
             return $response->json();
         } catch (Exception $e) {
             Log::error('BVN 2.0 Verification Failed: ' . $e->getMessage());
+            throw $e;
+        }
+    }
+    /**
+     * Verify BVN with enhanced details (BVN 2.0)
+     */
+    public function verifyBVN(string $bvn, string $reference): array
+    {
+        try {
+            $response = Http::withHeaders($this->headers)
+                ->post($this->baseUrl . '/kyc/bvn/verify.1.0', [
+                    'bvn'       => $bvn,
+                    'reference' => $reference,
+                ]);
+            Log::info('BVN 1.0 Verification Successful: ' . $response);
+
+            return $response->json();
+        } catch (Exception $e) {
+            Log::error('BVN 1.0 Verification Failed: ' . $e->getMessage());
             throw $e;
         }
     }
@@ -69,7 +87,7 @@ class KYCService
         try {
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/bvn/verify.3.0', [
-                    'bvn' => $bvn,
+                    'bvn'       => $bvn,
                     'reference' => $reference,
                 ]);
 
@@ -86,14 +104,14 @@ class KYCService
     public function lookupBankAccount(string $accountNo, string $bankCode, string $reference): array
     {
 
-        $originalBaseUrl = $this->baseUrl; // Store the original base URL
-        $this->baseUrl = preg_replace('/\/\d+\.\d+/', '/1.2', $this->baseUrl); // Change to version 1.2
+        $originalBaseUrl = $this->baseUrl;                                       // Store the original base URL
+        $this->baseUrl   = preg_replace('/\/\d+\.\d+/', '/1.2', $this->baseUrl); // Change to version 1.2
         try {
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/bank-account/lookup', [
                     'account_no' => $accountNo,
-                    'bank_code' => $bankCode,
-                    'reference' => $reference,
+                    'bank_code'  => $bankCode,
+                    'reference'  => $reference,
                 ]);
 
             return $response->json();
@@ -112,7 +130,7 @@ class KYCService
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/bank-account/find', [
                     'account_no' => $accountNo,
-                    'reference' => $reference,
+                    'reference'  => $reference,
                 ]);
 
             return $response->json();
@@ -130,7 +148,7 @@ class KYCService
         try {
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/phone-number/verify.3.0', [
-                    'phone_no' => $phoneNo,
+                    'phone_no'  => $phoneNo,
                     'reference' => $reference,
                 ]);
 
@@ -147,10 +165,15 @@ class KYCService
     public function verifyNIN(string $nin, string $reference): array
     {
 
+        $originalBaseUrl = $this->baseUrl;                                       // Store the original base URL
+        $this->baseUrl   = preg_replace('/\/\d+\.\d+/', '/1.2', $this->baseUrl); // Change to version 1.2
+
+        Log::alert("message: " . $this->baseUrl . '/kyc/nin/verify.1.0');
         try {
             $response = Http::withHeaders($this->headers)
-                ->post($this->baseUrl . '/kyc/nin/verify.2.0', [
-                    'nin' => $nin,
+            // ->post('https://api.mockfly.dev/mocks/0e8bc8ec-7230-450f-a05e-04610e68eab7/user/kyc/nin/validate', [
+                ->post($this->baseUrl . '/kyc/nin/verify.1.0', [
+                    'nin'       => $nin,
                     'reference' => $reference,
                 ]);
 
@@ -182,8 +205,8 @@ class KYCService
      */
     public function verifyPassport(array $data): array
     {
-        $originalBaseUrl = $this->baseUrl; // Store the original base URL
-        $this->baseUrl = preg_replace('/\/\d+\.\d+/', '/1.2', $this->baseUrl); // Change to version 1.2
+        $originalBaseUrl = $this->baseUrl;                                       // Store the original base URL
+        $this->baseUrl   = preg_replace('/\/\d+\.\d+/', '/1.2', $this->baseUrl); // Change to version 1.2
 
         try {
             $response = Http::withHeaders($this->headers)
@@ -205,7 +228,7 @@ class KYCService
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/bank-account/get-tier', [
                     'account_no' => $accountNo,
-                    'bank_code' => $bankCode,
+                    'bank_code'  => $bankCode,
                 ]);
 
             return $response->json();
@@ -224,8 +247,8 @@ class KYCService
             $response = Http::withHeaders($this->headers)
                 ->post($this->baseUrl . '/kyc/bank-account/validate-tier', [
                     'account_no' => $accountNo,
-                    'bank_code' => $bankCode,
-                    'amount' => $amount,
+                    'bank_code'  => $bankCode,
+                    'amount'     => $amount,
                 ]);
 
             return $response->json();

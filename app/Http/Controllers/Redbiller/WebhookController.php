@@ -1,5 +1,4 @@
 <?php
-
 namespace App\Http\Controllers\Redbiller;
 
 use App\Http\Controllers\Controller;
@@ -19,7 +18,7 @@ class WebhookController extends Controller
 
     public function __construct(RedbillerService $redbillerService, BillPaymentService $billPaymentService)
     {
-        $this->redbillerService = $redbillerService;
+        $this->redbillerService   = $redbillerService;
         $this->billPaymentService = $billPaymentService;
 
     }
@@ -32,9 +31,9 @@ class WebhookController extends Controller
     {
         $data = $request->all();
         try {
-            $details = $request->input('details');
+            $details   = $request->input('details');
             $reference = $details['reference'] ?? null;
-            $result = $this->redbillerService->verifyBankTransfer($reference);
+            $result    = $this->redbillerService->verifyBankTransfer($reference);
 
             // Log the result of the bank transfer verification
             if ($result['status'] === 'true') {
@@ -55,31 +54,15 @@ class WebhookController extends Controller
         }
     }
 
-    public function handleDepositWebhook(Request $request): JsonResponse
+    public function verifyDepositWebhook(Request $request): JsonResponse
     {
-        $data = $request->all();
         try {
 
-            Log::info($data);
-            $details = $request->input('details');
-            $reference = $details['reference'] ?? null;
+            $reference = $request->reference;
 
-            // Verify the deposit using the reference
             $verificationResult = $this->redbillerService->verifyDeposit($reference);
 
-            // Log the result of the deposit verification
-            if ($verificationResult['status'] === 'true' && $verificationResult['details']['status'] === 'Approved') {
-                Log::info('Deposit verified successfully for reference: ' . $reference, [
-                    'verification_result' => $verificationResult,
-                ]);
-                return response()->json($verificationResult);
-            } else {
-                $this->handlePaymentFailed($data);
-                Log::warning('Deposit verification failed for reference: ' . $reference, [
-                    'verification_result' => $verificationResult,
-                ]);
-                return response()->json(['error' => 'Deposit verification failed.'], 400);
-            }
+            return response()->json($verificationResult);
         } catch (Exception $e) {
             Log::error('Error verifying deposit: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
@@ -116,13 +99,13 @@ class WebhookController extends Controller
         Log::info($request->all());
 
         try {
-            $details = $request->input('details');
+            $details   = $request->input('details');
             $reference = $details['reference'] ?? null;
 
             $verificationResult = $this->billPaymentService->verifyAirtimePurchase($reference);
             if ($verificationResult['status'] === 'true' && $verificationResult['response'] === 200) {
                 Log::info('Airtime processed successfully.', [
-                    'data' => $details,
+                    'data'                => $details,
                     'verification_result' => $verificationResult,
                 ]);
                 return response()->json(['message' => 'Airtime processed successfully.'], 200);
@@ -144,13 +127,13 @@ class WebhookController extends Controller
     {
 
         try {
-            $details = $request->input('details');
+            $details   = $request->input('details');
             $reference = $details['reference'] ?? null;
 
             $verificationResult = $this->billPaymentService->verifyDataPlanPurchase($reference);
             if ($verificationResult['status'] === 'true' && $verificationResult['response'] === 200) {
                 Log::info('Data processed successfully.', [
-                    'data' => $details,
+                    'data'                => $details,
                     'verification_result' => $verificationResult,
                 ]);
                 return response()->json(['message' => 'Data processed successfully.'], 200);
@@ -172,13 +155,13 @@ class WebhookController extends Controller
     {
 
         try {
-            $details = $request->input('details');
+            $details   = $request->input('details');
             $reference = $details['reference'] ?? null;
 
             $verificationResult = $this->billPaymentService->verifyCableTVPurchase($reference);
             if ($verificationResult['status'] === 'true' && $verificationResult['response'] === 200) {
                 Log::info('TV processed successfully.', [
-                    'data' => $details,
+                    'data'                => $details,
                     'verification_result' => $verificationResult,
                 ]);
                 return response()->json(['message' => 'TV processed successfully.'], 200);
@@ -200,13 +183,13 @@ class WebhookController extends Controller
     {
 
         try {
-            $details = $request->input('details');
+            $details   = $request->input('details');
             $reference = $details['reference'] ?? null;
 
             $verificationResult = $this->billPaymentService->verifyElectricityPurchase($reference);
             if ($verificationResult['status'] === 'true' && $verificationResult['response'] === 200) {
                 Log::info('Electricity processed successfully.', [
-                    'data' => $details,
+                    'data'                => $details,
                     'verification_result' => $verificationResult,
                 ]);
                 return response()->json(['message' => 'Electricity processed successfully.'], 200);
@@ -229,13 +212,13 @@ class WebhookController extends Controller
         $data = $request->all();
 
         try {
-            $details = $request->input('details');
+            $details   = $request->input('details');
             $reference = $details['reference'] ?? null;
 
             $verificationResult = $this->billPaymentService->verifyBettingPayment($reference);
             if ($verificationResult['status'] === 'true' && $verificationResult['response'] === 200) {
                 Log::info('Betting processed successfully.', [
-                    'data' => $details,
+                    'data'                => $details,
                     'verification_result' => $verificationResult,
                 ]);
                 return response()->json(['message' => 'Betting processed successfully.'], 200);

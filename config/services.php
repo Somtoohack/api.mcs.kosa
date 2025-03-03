@@ -15,30 +15,31 @@ return [
      */
 
     'redbiller' => [
-        'base_url' => env('REDBILLER_BASE_URL', 'https://api.live.redbiller.com/1.0'),
+        'base_url'    => env('REDBILLER_BASE_URL', 'https://api.live.redbiller.com/1.0'),
+        'test_url'    => env('REDBILLER_TEST_URL', 'https://api.test.redbiller.com/1.0'),
         'private_key' => env('REDBILLER_PRIVATE_KEY'),
-        'public_key' => env('REDBILLER_PUBLIC_KEY'),
-        'auth_hook' => env('REDBILLER_AUTH_HOOK'),
+        'public_key'  => env('REDBILLER_PUBLIC_KEY'),
+        'auth_hook'   => env('REDBILLER_AUTH_HOOK'),
     ],
 
-    'postmark' => [
+    'postmark'  => [
         'token' => env('POSTMARK_TOKEN'),
     ],
 
-    'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
+    'ses'       => [
+        'key'    => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
 
-    'resend' => [
+    'resend'    => [
         'key' => env('RESEND_KEY'),
     ],
 
-    'slack' => [
+    'slack'     => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+            'channel'              => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
 
